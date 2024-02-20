@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  microservice:
+    build:
+      context: .
+      dockerfile: ./nodejs/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: microservice
+    depends_on:
+      - mysql
+
+  react-app:
+    build:
+      context: .
+      dockerfile: ./react/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - microservice
+
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: microservice
+    volumes:
+       - ./mysql-data:/var/lib/mysql
+
+  phpMyadmin:
+    image: phpmyadmin
+    environment:
+      PMA_ARBITRARY: 1
+    ports:
+      - "8888:80"
+    depends_on:
+      - mysql 
